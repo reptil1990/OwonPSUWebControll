@@ -1,45 +1,50 @@
 # OWON PSU Web Controller
 
-Ein modernes Webinterface zur Steuerung und Überwachung von OWON (und kompatiblen) Labornetzteilen über die Web Serial API (z.B. Chrome/Edge).
+A modern web interface for controlling and monitoring OWON (and compatible) laboratory power supplies via the Web Serial API (e.g. Chrome/Edge).
 
 Available for testing: https://reptil1990.github.io/OwonWebControll/
 
 ## Features
-- Verbindung zu OWON Netzteilen via Web Serial API (USB)
-- Live-Anzeige von Spannung und Strom
-- Setzen von Sollwerten und Limits
-- Ausgang ein-/ausschalten
-- Not-Aus Funktion
-- Logbuch für alle Kommandos und Antworten
-- Responsive, modernes UI (auch mobil nutzbar)
 
-## Voraussetzungen
-- OWON Netzteil (z.B. SPM, SPE, P4 Serie) oder kompatibles Gerät
-- Aktueller Chromium-basierter Browser (Chrome, Edge, Opera, ...)
-- Aktivierte Web Serial API (Standard in Chrome/Edge)
+- Connect to OWON power supplies via Web Serial API (USB)
+- Set target values and limits
+- Switch output on/off
+- Emergency stop function
+- Logbook for all commands and responses
+- Responsive, modern UI (usable on mobile devices)
 
-## Nutzung
-1. **Projekt klonen oder entpacken**
-2. `index.html` im Browser öffnen
-3. Auf "Mit OWON PSU verbinden" klicken und das Netzteil auswählen
-4. Einstellungen und Messwerte wie gewünscht nutzen
+## Requirements
 
-## Hinweise
-- Die Web Serial API funktioniert **nicht** in Firefox oder Safari.
-- Bei Problemen mit Timeouts: USB-Kabel prüfen, Netzteil neu starten, Browser neu laden.
-- Die Firmware des Netzteils muss SCPI-kompatibel sein.
+- OWON power supply (e.g. SPM, SPE, P4 series) or compatible device
+- Recent Chromium-based browser (Chrome, Edge, Opera, ...)
+- Enabled Web Serial API (default in Chrome/Edge)
 
-## Sicherheit
-- Die Not-Aus-Funktion schaltet den Ausgang sofort ab.
-- Es werden keine Daten ins Internet übertragen – alles läuft lokal im Browser.
+## Usage
 
-## Lizenz
+1. **Clone or extract the project**
+2. Open `index.html` in your browser
+3. Click on "Connect to OWON PSU" and select your power supply
+4. Use the settings and measurements as desired
+
+## Notes
+
+- The Web Serial API does **not** work in Firefox or Safari.
+- If you experience timeouts: check the USB cable, restart the power supply, reload the browser.
+- The power supply firmware must be SCPI compatible.
+
+## Safety
+
+- The emergency stop function immediately switches off the output.
+- No data is transmitted to the internet – everything runs locally in your browser.
+
+## License
+
 MIT License
 
 ---
 
-**Entwickelt für den schulischen/privaten Gebrauch. Keine Garantie auf Funktion oder Geräteschutz!**
+**Developed for educational/private use. No guarantee of function or device protection!**
 
 ---
 
-Developed with love from reptil1990
+Developed with love by reptil1990

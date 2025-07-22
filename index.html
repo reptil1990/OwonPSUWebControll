@@ -1,805 +1,875 @@
 <!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OWON PSU Controller v0.0.2</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+      }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
 
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+      }
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
 
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
 
-        .main-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+      .main-panel {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
 
-        .connection-section {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+      .connection-section {
+        text-align: center;
+        margin-bottom: 30px;
+      }
 
-        .connect-btn {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.1rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-        }
+      .connect-btn {
+        background: linear-gradient(45deg, #4caf50, #45a049);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+      }
 
-        .connect-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
-        }
+      .connect-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+      }
 
-        .connect-btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+      .connect-btn:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
 
-        .status {
-            margin: 15px 0;
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: bold;
-        }
+      .status {
+        margin: 15px 0;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: bold;
+      }
 
-        .status.connected {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
+      .status.connected {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
 
-        .status.disconnected {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+      .status.disconnected {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
 
+      .controls {
+        display: none;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-top: 30px;
+      }
+
+      .controls.show {
+        display: grid;
+      }
+
+      .control-group {
+        background: rgba(255, 255, 255, 0.7);
+        padding: 20px;
+        border-radius: 15px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      .control-group h3 {
+        margin-bottom: 15px;
+        color: #333;
+        font-size: 1.2rem;
+        text-align: center;
+      }
+
+      .input-group {
+        margin-bottom: 15px;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        color: #555;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+      }
+
+      .input-group input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        margin: 5px;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn.danger {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+      }
+
+      .btn.success {
+        background: linear-gradient(45deg, #27ae60, #229954);
+      }
+
+      .measurements {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .measurement {
+        background: rgba(255, 255, 255, 0.8);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        border: 2px solid #eee;
+      }
+
+      .measurement .value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .measurement .unit {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 5px;
+      }
+
+      .output-control {
+        text-align: center;
+        margin: 20px 0;
+      }
+
+      .output-toggle {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+      }
+
+      .output-toggle input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 34px;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      input:checked + .slider {
+        background-color: #4caf50;
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(26px);
+      }
+
+      .log {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 20px;
+        max-height: 200px;
+        overflow-y: auto;
+        font-family: "Courier New", monospace;
+        font-size: 0.9rem;
+      }
+
+      .error {
+        color: #dc3545;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+      }
+
+      @media (max-width: 768px) {
         .controls {
-            display: none;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-top: 30px;
+          grid-template-columns: 1fr;
         }
-
-        .controls.show {
-            display: grid;
-        }
-
-        .control-group {
-            background: rgba(255, 255, 255, 0.7);
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .control-group h3 {
-            margin-bottom: 15px;
-            color: #333;
-            font-size: 1.2rem;
-            text-align: center;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #555;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            margin: 5px;
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn.danger {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-        }
-
-        .btn.success {
-            background: linear-gradient(45deg, #27ae60, #229954);
-        }
-
         .measurements {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 20px 0;
+          grid-template-columns: 1fr;
         }
-
-        .measurement {
-            background: rgba(255, 255, 255, 0.8);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            border: 2px solid #eee;
-        }
-
-        .measurement .value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .measurement .unit {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .output-control {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .output-toggle {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-
-        .output-toggle input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: #4CAF50;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
-        .log {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-            max-height: 200px;
-            overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-        }
-
-        .error {
-            color: #dc3545;
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-
-        @media (max-width: 768px) {
-            .controls {
-                grid-template-columns: 1fr;
-            }
-            .measurements {
-                grid-template-columns: 1fr;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="header">
-            <h1>🔌 OWON PSU Controller</h1>
-            <p>Web Serial Interface für OWON Netzteile v0.0.2</p>
+      <div class="header">
+        <h1>🔌 OWON PSU Controller</h1>
+        <p>Web Serial Interface for OWON Power Supplies v0.0.2</p>
+      </div>
+
+      <div class="main-panel">
+        <div class="connection-section">
+          <button id="connectBtn" class="connect-btn">
+            Connect to OWON PSU
+          </button>
+          <div id="status" class="status disconnected">Not connected</div>
+          <div
+            id="identity"
+            style="margin-top: 10px; font-style: italic; color: #666"
+          ></div>
         </div>
 
-        <div class="main-panel">
-            <div class="connection-section">
-                <button id="connectBtn" class="connect-btn">Mit OWON PSU verbinden</button>
-                <div id="status" class="status disconnected">Nicht verbunden</div>
-                <div id="identity" style="margin-top: 10px; font-style: italic; color: #666;"></div>
+        <div id="controls" class="controls">
+          <div class="control-group">
+            <h3>📊 Measurements</h3>
+            <div class="measurements">
+              <div class="measurement">
+                <div class="value" id="voltageReading">--</div>
+                <div class="unit">Volt</div>
+              </div>
+              <div class="measurement">
+                <div class="value" id="currentReading">--</div>
+                <div class="unit">Ampere</div>
+              </div>
+            </div>
+            <button class="btn" onclick="updateMeasurements()">
+              🔄 Refresh
+            </button>
+
+            <div class="output-control">
+              <h4>Output On/Off</h4>
+              <label class="output-toggle">
+                <input
+                  type="checkbox"
+                  id="outputToggle"
+                  onchange="toggleOutput()"
+                />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <h3>⚙️ Settings</h3>
+
+            <div class="input-group">
+              <label for="voltageSet">Voltage (V):</label>
+              <input
+                type="number"
+                id="voltageSet"
+                step="0.001"
+                min="0"
+                placeholder="0.000"
+              />
+              <button class="btn" onclick="setVoltage()">Set</button>
             </div>
 
-            <div id="controls" class="controls">
-                <div class="control-group">
-                    <h3>📊 Messungen</h3>
-                    <div class="measurements">
-                        <div class="measurement">
-                            <div class="value" id="voltageReading">--</div>
-                            <div class="unit">Volt</div>
-                        </div>
-                        <div class="measurement">
-                            <div class="value" id="currentReading">--</div>
-                            <div class="unit">Ampere</div>
-                        </div>
-                    </div>
-                    <button class="btn" onclick="updateMeasurements()">🔄 Aktualisieren</button>
-                    
-                    <div class="output-control">
-                        <h4>Ausgang Ein/Aus</h4>
-                        <label class="output-toggle">
-                            <input type="checkbox" id="outputToggle" onchange="toggleOutput()">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <h3>⚙️ Einstellungen</h3>
-                    
-                    <div class="input-group">
-                        <label for="voltageSet">Spannung (V):</label>
-                        <input type="number" id="voltageSet" step="0.001" min="0" placeholder="0.000">
-                        <button class="btn" onclick="setVoltage()">Setzen</button>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="currentSet">Strom (A):</label>
-                        <input type="number" id="currentSet" step="0.001" min="0" placeholder="0.000">
-                        <button class="btn" onclick="setCurrent()">Setzen</button>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="voltageLimitSet">Spannungslimit (V):</label>
-                        <input type="number" id="voltageLimitSet" step="0.001" min="0" placeholder="0.000">
-                        <button class="btn" onclick="setVoltageLimit()">Setzen</button>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="currentLimitSet">Stromlimit (A):</label>
-                        <input type="number" id="currentLimitSet" step="0.001" min="0" placeholder="0.000">
-                        <button class="btn" onclick="setCurrentLimit()">Setzen</button>
-                    </div>
-
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="btn success" onclick="refreshAll()">📋 Alle Werte laden</button>
-                        <button class="btn danger" onclick="emergencyStop()">🚨 Notaus</button>
-                    </div>
-                </div>
+            <div class="input-group">
+              <label for="currentSet">Current (A):</label>
+              <input
+                type="number"
+                id="currentSet"
+                step="0.001"
+                min="0"
+                placeholder="0.000"
+              />
+              <button class="btn" onclick="setCurrent()">Set</button>
             </div>
 
-            <div id="log" class="log"></div>
+            <div class="input-group">
+              <label for="voltageLimitSet">Voltage Limit (V):</label>
+              <input
+                type="number"
+                id="voltageLimitSet"
+                step="0.001"
+                min="0"
+                placeholder="0.000"
+              />
+              <button class="btn" onclick="setVoltageLimit()">Set</button>
+            </div>
+
+            <div class="input-group">
+              <label for="currentLimitSet">Current Limit (A):</label>
+              <input
+                type="number"
+                id="currentLimitSet"
+                step="0.001"
+                min="0"
+                placeholder="0.000"
+              />
+              <button class="btn" onclick="setCurrentLimit()">Set</button>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px">
+              <button class="btn success" onclick="refreshAll()">
+                📋 Load all values
+              </button>
+              <button class="btn danger" onclick="emergencyStop()">
+                🚨 Emergency Stop
+              </button>
+            </div>
+          </div>
         </div>
+
+        <div id="log" class="log"></div>
+      </div>
     </div>
 
     <script>
-        class OwonPSU {
-            constructor() {
-                this.SUPPORTED_DEVICES = ["OWON,SPE", "OWON,SPM", "OWON,P4", "KIPRIM,DC"];
-                this.port = null;
-                this.reader = null;
-                this.writer = null;
-                this.timeout = 2000; // 2000ms default timeout
-            }
-
-            async connect() {
-                try {
-                    // Check if Web Serial is supported
-                    if (!("serial" in navigator)) {
-                        throw new Error("Web Serial API wird von diesem Browser nicht unterstützt!");
-                    }
-
-                    // Request port selection
-                    this.port = await navigator.serial.requestPort();
-                    
-                    // Open the port
-                    await this.port.open({ 
-                        baudRate: 115200,
-                        dataBits: 8,
-                        stopBits: 1,
-                        parity: 'none'
-                    });
-
-                    // Get reader and writer
-                    this.reader = this.port.readable.getReader();
-                    this.writer = this.port.writable.getWriter();
-
-                    // Verify device identity
-                    const identity = await this.readIdentity();
-                    const isSupported = this.SUPPORTED_DEVICES.some(device => identity.includes(device));
-                    
-                    if (!isSupported) {
-                        await this.disconnect();
-                        throw new Error(`Nicht unterstütztes Gerät: ${identity}`);
-                    }
-
-                    this.log(`✅ Verbunden mit: ${identity}`);
-                    return identity;
-                } catch (error) {
-                    this.log(`❌ Verbindungsfehler: ${error.message}`, 'error');
-                    throw error;
-                }
-            }
-
-            async disconnect() {
-                try {
-                    if (this.reader) {
-                        await this.reader.cancel();
-                        await this.reader.releaseLock();
-                        this.reader = null;
-                    }
-                    if (this.writer) {
-                        await this.writer.releaseLock();
-                        this.writer = null;
-                    }
-                    if (this.port) {
-                        await this.port.close();
-                        this.port = null;
-                    }
-                    this.log("🔌 Verbindung getrennt");
-                } catch (error) {
-                    this.log(`❌ Fehler beim Trennen: ${error.message}`, 'error');
-                }
-            }
-
-            async sendCommand(command, acceptSilent = false, timeout = null) {
-                if (!this.port || !this.writer || !this.reader) {
-                    throw new Error("Keine Verbindung zum Gerät!");
-                }
-
-                try {
-                    // Send command
-                    const encoder = new TextEncoder();
-                    await this.writer.write(encoder.encode(command + '\n'));
-                    this.log(`📤 Gesendet: ${command}`);
-
-                    // Read response with timeout
-                    const timeoutMs = timeout || this.timeout;
-                    const response = await this.readWithTimeout(timeoutMs);
-                    
-                    if (!response.endsWith('\r\n') && !acceptSilent) {
-                        throw new Error(`Keine Antwort für Befehl: '${command}'!`);
-                    }
-
-                    const cleanResponse = response.replace(/\r\n$/, '');
-                    this.log(`📥 Empfangen: ${cleanResponse}`);
-                    return cleanResponse;
-                } catch (error) {
-                    this.log(`❌ Befehlsfehler: ${error.message}`, 'error');
-                    throw error;
-                }
-            }
-
-            // ...existing code...
-async sendSilentCommand(command) {
-    if (!this.port || !this.writer) {
-        throw new Error("Keine Verbindung zum Gerät!");
-    }
-    try {
-        const encoder = new TextEncoder();
-        await this.writer.write(encoder.encode(command + '\n'));
-        this.log(`📤 Gesendet (silent): ${command}`);
-        // Keine Antwort abwarten!
-        return;
-    } catch (error) {
-        this.log(`❌ Befehlsfehler (silent): ${error.message}`, 'error');
-        throw error;
-    }
-}
-// ...existing code...
-
-            async readWithTimeout(timeoutMs) {
-                return new Promise(async (resolve, reject) => {
-                    const timeout = setTimeout(() => {
-                        reject(new Error("Timeout beim Lesen der Antwort"));
-                    }, timeoutMs);
-
-                    try {
-                        const decoder = new TextDecoder();
-                        let response = '';
-                        
-                        while (true) {
-                            const { value, done } = await this.reader.read();
-                            if (done) break;
-                            
-                            const chunk = decoder.decode(value, { stream: true });
-                            response += chunk;
-                            
-                            if (response.includes('\r\n')) {
-                                break;
-                            }
-                        }
-                        
-                        clearTimeout(timeout);
-                        resolve(response);
-                    } catch (error) {
-                        clearTimeout(timeout);
-                        reject(error);
-                    }
-                });
-            }
-
-            async readIdentity() {
-                return await this.sendCommand("*IDN?");
-            }
-
-            async measureVoltage() {
-                const response = await this.sendCommand("MEASure:VOLTage?");
-                return parseFloat(response);
-            }
-
-            async measureCurrent() {
-                const response = await this.sendCommand("MEASure:CURRent?");
-                return parseFloat(response);
-            }
-
-            async getVoltage() {
-                const response = await this.sendCommand("VOLTage?");
-                return parseFloat(response);
-            }
-
-            async getCurrent() {
-                const response = await this.sendCommand("CURRent?");
-                return parseFloat(response);
-            }
-
-            async getVoltageLimit() {
-                const response = await this.sendCommand("VOLTage:LIMit?");
-                return parseFloat(response);
-            }
-
-            async getCurrentLimit() {
-                const response = await this.sendCommand("CURRent:LIMit?");
-                return parseFloat(response);
-            }
-
-            async setVoltage(voltage) {
-                return await this.sendSilentCommand(`VOLTage ${voltage.toFixed(3)}`);
-            }
-
-            async setCurrent(current) {
-                return await this.sendSilentCommand(`CURRent ${current.toFixed(3)}`);
-            }
-
-            async setVoltageLimit(voltage) {
-                return await this.sendSilentCommand(`VOLTage:LIMit ${voltage.toFixed(3)}`);
-            }
-
-            async setCurrentLimit(current) {
-                return await this.sendSilentCommand(`CURRent:LIMit ${current.toFixed(3)}`);
-            }
-
-            async getOutput() {
-                const response = await this.sendCommand("OUTPut?");
-                if (response === "0" || response === "1") {
-                    return response === "1";
-                }
-                if (response !== "ON" && response !== "OFF") {
-                    throw new Error(`Unbekannte Antwort für Output-Befehl: ${response}`);
-                }
-                return response === "ON";
-            }
-
-            async setOutput(enabled) {
-                return await this.sendSilentCommand(`OUTPut ${enabled ? 'ON' : 'OFF'}`);
-            }
-
-            async setKeylock(enabled) {
-                if (enabled) {
-                    return await this.sendSilentCommand("SYST:REM");
-                } else {
-                    return await this.sendSilentCommand("SYST:LOC");
-                }
-            }
-
-            log(message, type = 'info') {
-                const logElement = document.getElementById('log');
-                const timestamp = new Date().toLocaleTimeString();
-                const logEntry = `[${timestamp}] ${message}`;
-                
-                const div = document.createElement('div');
-                div.textContent = logEntry;
-                if (type === 'error') {
-                    div.style.color = '#dc3545';
-                }
-                
-                logElement.appendChild(div);
-                logElement.scrollTop = logElement.scrollHeight;
-            }
+      class OwonPSU {
+        constructor() {
+          this.SUPPORTED_DEVICES = [
+            "OWON,SPE",
+            "OWON,SPM",
+            "OWON,P4",
+            "KIPRIM,DC",
+          ];
+          this.port = null;
+          this.reader = null;
+          this.writer = null;
+          this.timeout = 2000; // 2000ms default timeout
         }
 
-        // Global PSU instance
-        const psu = new OwonPSU();
-        let isConnected = false;
-
-        // UI Functions
-        async function connectToPSU() {
-            const connectBtn = document.getElementById('connectBtn');
-            const statusDiv = document.getElementById('status');
-            const identityDiv = document.getElementById('identity');
-            const controlsDiv = document.getElementById('controls');
-
-            try {
-                connectBtn.disabled = true;
-                connectBtn.textContent = 'Verbinde...';
-                statusDiv.textContent = 'Verbinde...';
-                
-                const identity = await psu.connect();
-                
-                isConnected = true;
-                connectBtn.textContent = 'Verbindung trennen';
-                connectBtn.className = 'connect-btn danger';
-                statusDiv.textContent = 'Verbunden';
-                statusDiv.className = 'status connected';
-                identityDiv.textContent = identity;
-                controlsDiv.classList.add('show');
-                
-                // Load initial values
-                await refreshAll();
-                
-            } catch (error) {
-                statusDiv.textContent = 'Verbindung fehlgeschlagen';
-                statusDiv.className = 'status disconnected';
-                connectBtn.textContent = 'Mit OWON PSU verbinden';
-                connectBtn.className = 'connect-btn';
-            } finally {
-                connectBtn.disabled = false;
-            }
-        }
-
-        async function disconnectFromPSU() {
-            const connectBtn = document.getElementById('connectBtn');
-            const statusDiv = document.getElementById('status');
-            const identityDiv = document.getElementById('identity');
-            const controlsDiv = document.getElementById('controls');
-
-            try {
-                await psu.disconnect();
-                
-                isConnected = false;
-                connectBtn.textContent = 'Mit OWON PSU verbinden';
-                connectBtn.className = 'connect-btn';
-                statusDiv.textContent = 'Nicht verbunden';
-                statusDiv.className = 'status disconnected';
-                identityDiv.textContent = '';
-                controlsDiv.classList.remove('show');
-                
-            } catch (error) {
-                psu.log(`Fehler beim Trennen: ${error.message}`, 'error');
-            }
-        }
-
-        async function updateMeasurements() {
-            try {
-                const voltage = await psu.measureVoltage();
-                const current = await psu.measureCurrent();
-                
-                document.getElementById('voltageReading').textContent = voltage.toFixed(3);
-                document.getElementById('currentReading').textContent = current.toFixed(3);
-                
-                const outputState = await psu.getOutput();
-                document.getElementById('outputToggle').checked = outputState;
-                
-            } catch (error) {
-                psu.log(`Fehler beim Lesen der Messungen: ${error.message}`, 'error');
-            }
-        }
-
-        async function setVoltage() {
-            const voltage = parseFloat(document.getElementById('voltageSet').value);
-            if (isNaN(voltage)) {
-                psu.log('Ungültiger Spannungswert!', 'error');
-                return;
-            }
-            
-            try {
-                await psu.setVoltage(voltage);
-                psu.log(`✅ Spannung gesetzt: ${voltage.toFixed(3)}V`);
-            } catch (error) {
-                psu.log(`Fehler beim Setzen der Spannung: ${error.message}`, 'error');
-            }
-        }
-
-        async function setCurrent() {
-            const current = parseFloat(document.getElementById('currentSet').value);
-            if (isNaN(current)) {
-                psu.log('Ungültiger Stromwert!', 'error');
-                return;
-            }
-            
-            try {
-                await psu.setCurrent(current);
-                psu.log(`✅ Strom gesetzt: ${current.toFixed(3)}A`);
-            } catch (error) {
-                psu.log(`Fehler beim Setzen des Stroms: ${error.message}`, 'error');
-            }
-        }
-
-        async function setVoltageLimit() {
-            const voltage = parseFloat(document.getElementById('voltageLimitSet').value);
-            if (isNaN(voltage)) {
-                psu.log('Ungültiger Spannungsgrenzwert!', 'error');
-                return;
-            }
-            
-            try {
-                await psu.setVoltageLimit(voltage);
-                psu.log(`✅ Spannungslimit gesetzt: ${voltage.toFixed(3)}V`);
-            } catch (error) {
-                psu.log(`Fehler beim Setzen des Spannungslimits: ${error.message}`, 'error');
-            }
-        }
-
-        async function setCurrentLimit() {
-            const current = parseFloat(document.getElementById('currentLimitSet').value);
-            if (isNaN(current)) {
-                psu.log('Ungültiger Stromgrenzwert!', 'error');
-                return;
-            }
-            
-            try {
-                await psu.setCurrentLimit(current);
-                psu.log(`✅ Stromlimit gesetzt: ${current.toFixed(3)}A`);
-            } catch (error) {
-                psu.log(`Fehler beim Setzen des Stromlimits: ${error.message}`, 'error');
-            }
-        }
-
-        async function toggleOutput() {
-            const enabled = document.getElementById('outputToggle').checked;
-            try {
-                await psu.setOutput(enabled);
-                psu.log(`✅ Ausgang ${enabled ? 'aktiviert' : 'deaktiviert'}`);
-            } catch (error) {
-                psu.log(`Fehler beim Umschalten des Ausgangs: ${error.message}`, 'error');
-                // Revert checkbox state
-                document.getElementById('outputToggle').checked = !enabled;
-            }
-        }
-
-        async function refreshAll() {
-            try {
-                // Get current settings
-                const voltage = await psu.getVoltage();
-                const current = await psu.getCurrent();
-                const voltageLimit = await psu.getVoltageLimit();
-                const currentLimit = await psu.getCurrentLimit();
-                
-                // Update input fields
-                document.getElementById('voltageSet').value = voltage.toFixed(3);
-                document.getElementById('currentSet').value = current.toFixed(3);
-                document.getElementById('voltageLimitSet').value = voltageLimit.toFixed(3);
-                document.getElementById('currentLimitSet').value = currentLimit.toFixed(3);
-                
-                // Update measurements
-                await updateMeasurements();
-                
-                psu.log('✅ Alle Werte aktualisiert');
-            } catch (error) {
-                psu.log(`Fehler beim Aktualisieren: ${error.message}`, 'error');
-            }
-        }
-
-        async function emergencyStop() {
-            try {
-                await psu.setOutput(false);
-                document.getElementById('outputToggle').checked = false;
-                psu.log('🚨 NOTAUS - Ausgang deaktiviert!');
-            } catch (error) {
-                psu.log(`Fehler beim Notaus: ${error.message}`, 'error');
-            }
-        }
-
-        // Event Listeners
-        document.getElementById('connectBtn').addEventListener('click', async () => {
-            if (isConnected) {
-                await disconnectFromPSU();
-            } else {
-                await connectToPSU();
-            }
-        });
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
+        async connect() {
+          try {
             // Check if Web Serial is supported
             if (!("serial" in navigator)) {
-                document.getElementById('status').textContent = 'Web Serial API wird nicht unterstützt!';
-                document.getElementById('status').className = 'status disconnected';
-                document.getElementById('connectBtn').disabled = true;
-                psu.log('❌ Web Serial API wird von diesem Browser nicht unterstützt!', 'error');
-                psu.log('💡 Verwenden Sie Chrome, Edge oder einen anderen Chromium-basierten Browser.', 'error');
-            } else {
-                psu.log('✅ Web Serial API verfügbar');
-                psu.log('🔌 Bereit zum Verbinden mit OWON PSU');
+              throw new Error(
+                "Web Serial API wird von diesem Browser nicht unterstützt!"
+              );
             }
+
+            // Request port selection
+            this.port = await navigator.serial.requestPort();
+
+            // Open the port
+            await this.port.open({
+              baudRate: 115200,
+              dataBits: 8,
+              stopBits: 1,
+              parity: "none",
+            });
+
+            // Get reader and writer
+            this.reader = this.port.readable.getReader();
+            this.writer = this.port.writable.getWriter();
+
+            // Verify device identity
+            const identity = await this.readIdentity();
+            const isSupported = this.SUPPORTED_DEVICES.some((device) =>
+              identity.includes(device)
+            );
+
+            if (!isSupported) {
+              await this.disconnect();
+              throw new Error(`Nicht unterstütztes Gerät: ${identity}`);
+            }
+
+            this.log(`✅ Verbunden mit: ${identity}`);
+            return identity;
+          } catch (error) {
+            this.log(`❌ Verbindungsfehler: ${error.message}`, "error");
+            throw error;
+          }
+        }
+
+        async disconnect() {
+          try {
+            if (this.reader) {
+              await this.reader.cancel();
+              await this.reader.releaseLock();
+              this.reader = null;
+            }
+            if (this.writer) {
+              await this.writer.releaseLock();
+              this.writer = null;
+            }
+            if (this.port) {
+              await this.port.close();
+              this.port = null;
+            }
+            this.log("🔌 Verbindung getrennt");
+          } catch (error) {
+            this.log(`❌ Fehler beim Trennen: ${error.message}`, "error");
+          }
+        }
+
+        async sendCommand(command, acceptSilent = false, timeout = null) {
+          if (!this.port || !this.writer || !this.reader) {
+            throw new Error("Keine Verbindung zum Gerät!");
+          }
+
+          try {
+            // Send command
+            const encoder = new TextEncoder();
+            await this.writer.write(encoder.encode(command + "\n"));
+            this.log(`📤 Gesendet: ${command}`);
+
+            // Read response with timeout
+            const timeoutMs = timeout || this.timeout;
+            const response = await this.readWithTimeout(timeoutMs);
+
+            if (!response.endsWith("\r\n") && !acceptSilent) {
+              throw new Error(`Keine Antwort für Befehl: '${command}'!`);
+            }
+
+            const cleanResponse = response.replace(/\r\n$/, "");
+            this.log(`📥 Empfangen: ${cleanResponse}`);
+            return cleanResponse;
+          } catch (error) {
+            this.log(`❌ Befehlsfehler: ${error.message}`, "error");
+            throw error;
+          }
+        }
+
+        // ...existing code...
+        async sendSilentCommand(command) {
+          if (!this.port || !this.writer) {
+            throw new Error("Keine Verbindung zum Gerät!");
+          }
+          try {
+            const encoder = new TextEncoder();
+            await this.writer.write(encoder.encode(command + "\n"));
+            this.log(`📤 Gesendet (silent): ${command}`);
+            // Keine Antwort abwarten!
+            return;
+          } catch (error) {
+            this.log(`❌ Befehlsfehler (silent): ${error.message}`, "error");
+            throw error;
+          }
+        }
+        // ...existing code...
+
+        async readWithTimeout(timeoutMs) {
+          return new Promise(async (resolve, reject) => {
+            const timeout = setTimeout(() => {
+              reject(new Error("Timeout beim Lesen der Antwort"));
+            }, timeoutMs);
+
+            try {
+              const decoder = new TextDecoder();
+              let response = "";
+
+              while (true) {
+                const { value, done } = await this.reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                response += chunk;
+
+                if (response.includes("\r\n")) {
+                  break;
+                }
+              }
+
+              clearTimeout(timeout);
+              resolve(response);
+            } catch (error) {
+              clearTimeout(timeout);
+              reject(error);
+            }
+          });
+        }
+
+        async readIdentity() {
+          return await this.sendCommand("*IDN?");
+        }
+
+        async measureVoltage() {
+          const response = await this.sendCommand("MEASure:VOLTage?");
+          return parseFloat(response);
+        }
+
+        async measureCurrent() {
+          const response = await this.sendCommand("MEASure:CURRent?");
+          return parseFloat(response);
+        }
+
+        async getVoltage() {
+          const response = await this.sendCommand("VOLTage?");
+          return parseFloat(response);
+        }
+
+        async getCurrent() {
+          const response = await this.sendCommand("CURRent?");
+          return parseFloat(response);
+        }
+
+        async getVoltageLimit() {
+          const response = await this.sendCommand("VOLTage:LIMit?");
+          return parseFloat(response);
+        }
+
+        async getCurrentLimit() {
+          const response = await this.sendCommand("CURRent:LIMit?");
+          return parseFloat(response);
+        }
+
+        async setVoltage(voltage) {
+          return await this.sendSilentCommand(`VOLTage ${voltage.toFixed(3)}`);
+        }
+
+        async setCurrent(current) {
+          return await this.sendSilentCommand(`CURRent ${current.toFixed(3)}`);
+        }
+
+        async setVoltageLimit(voltage) {
+          return await this.sendSilentCommand(
+            `VOLTage:LIMit ${voltage.toFixed(3)}`
+          );
+        }
+
+        async setCurrentLimit(current) {
+          return await this.sendSilentCommand(
+            `CURRent:LIMit ${current.toFixed(3)}`
+          );
+        }
+
+        async getOutput() {
+          const response = await this.sendCommand("OUTPut?");
+          if (response === "0" || response === "1") {
+            return response === "1";
+          }
+          if (response !== "ON" && response !== "OFF") {
+            throw new Error(
+              `Unbekannte Antwort für Output-Befehl: ${response}`
+            );
+          }
+          return response === "ON";
+        }
+
+        async setOutput(enabled) {
+          return await this.sendSilentCommand(
+            `OUTPut ${enabled ? "ON" : "OFF"}`
+          );
+        }
+
+        async setKeylock(enabled) {
+          if (enabled) {
+            return await this.sendSilentCommand("SYST:REM");
+          } else {
+            return await this.sendSilentCommand("SYST:LOC");
+          }
+        }
+
+        log(message, type = "info") {
+          const logElement = document.getElementById("log");
+          const timestamp = new Date().toLocaleTimeString();
+          const logEntry = `[${timestamp}] ${message}`;
+
+          const div = document.createElement("div");
+          div.textContent = logEntry;
+          if (type === "error") {
+            div.style.color = "#dc3545";
+          }
+
+          logElement.appendChild(div);
+          logElement.scrollTop = logElement.scrollHeight;
+        }
+      }
+
+      // Global PSU instance
+      const psu = new OwonPSU();
+      let isConnected = false;
+
+      // UI Functions
+      async function connectToPSU() {
+        const connectBtn = document.getElementById("connectBtn");
+        const statusDiv = document.getElementById("status");
+        const identityDiv = document.getElementById("identity");
+        const controlsDiv = document.getElementById("controls");
+
+        try {
+          connectBtn.disabled = true;
+          connectBtn.textContent = "Connecting...";
+          statusDiv.textContent = "Connecting...";
+
+          const identity = await psu.connect();
+
+          isConnected = true;
+          connectBtn.textContent = "Disconnect";
+          connectBtn.className = "connect-btn danger";
+          statusDiv.textContent = "Connected";
+          statusDiv.className = "status connected";
+          identityDiv.textContent = identity;
+          controlsDiv.classList.add("show");
+
+          // Load initial values
+          await refreshAll();
+        } catch (error) {
+          statusDiv.textContent = "Connection failed";
+          statusDiv.className = "status disconnected";
+          connectBtn.textContent = "Connect to OWON PSU";
+          connectBtn.className = "connect-btn";
+        } finally {
+          connectBtn.disabled = false;
+        }
+      }
+
+      async function disconnectFromPSU() {
+        const connectBtn = document.getElementById("connectBtn");
+        const statusDiv = document.getElementById("status");
+        const identityDiv = document.getElementById("identity");
+        const controlsDiv = document.getElementById("controls");
+
+        try {
+          await psu.disconnect();
+
+          isConnected = false;
+          connectBtn.textContent = "Connect to OWON PSU";
+          connectBtn.className = "connect-btn";
+          statusDiv.textContent = "Not connected";
+          statusDiv.className = "status disconnected";
+          identityDiv.textContent = "";
+          controlsDiv.classList.remove("show");
+        } catch (error) {
+          psu.log(`Error while disconnecting: ${error.message}`, "error");
+        }
+      }
+
+      async function updateMeasurements() {
+        try {
+          const voltage = await psu.measureVoltage();
+          const current = await psu.measureCurrent();
+
+          document.getElementById("voltageReading").textContent =
+            voltage.toFixed(3);
+          document.getElementById("currentReading").textContent =
+            current.toFixed(3);
+
+          const outputState = await psu.getOutput();
+          document.getElementById("outputToggle").checked = outputState;
+        } catch (error) {
+          psu.log(`Error reading measurements: ${error.message}`, "error");
+        }
+      }
+
+      async function setVoltage() {
+        const voltage = parseFloat(document.getElementById("voltageSet").value);
+        if (isNaN(voltage)) {
+          psu.log("Invalid voltage value!", "error");
+          return;
+        }
+
+        try {
+          await psu.setVoltage(voltage);
+          psu.log(`✅ Voltage set: ${voltage.toFixed(3)}V`);
+        } catch (error) {
+          psu.log(`Error setting voltage: ${error.message}`, "error");
+        }
+      }
+
+      async function setCurrent() {
+        const current = parseFloat(document.getElementById("currentSet").value);
+        if (isNaN(current)) {
+          psu.log("Invalid current value!", "error");
+          return;
+        }
+
+        try {
+          await psu.setCurrent(current);
+          psu.log(`✅ Current set: ${current.toFixed(3)}A`);
+        } catch (error) {
+          psu.log(`Error setting current: ${error.message}`, "error");
+        }
+      }
+
+      async function setVoltageLimit() {
+        const voltage = parseFloat(
+          document.getElementById("voltageLimitSet").value
+        );
+        if (isNaN(voltage)) {
+          psu.log("Invalid voltage limit!", "error");
+          return;
+        }
+
+        try {
+          await psu.setVoltageLimit(voltage);
+          psu.log(`✅ Voltage limit set: ${voltage.toFixed(3)}V`);
+        } catch (error) {
+          psu.log(`Error setting voltage limit: ${error.message}`, "error");
+        }
+      }
+
+      async function setCurrentLimit() {
+        const current = parseFloat(
+          document.getElementById("currentLimitSet").value
+        );
+        if (isNaN(current)) {
+          psu.log("Invalid current limit!", "error");
+          return;
+        }
+
+        try {
+          await psu.setCurrentLimit(current);
+          psu.log(`✅ Current limit set: ${current.toFixed(3)}A`);
+        } catch (error) {
+          psu.log(`Error setting current limit: ${error.message}`, "error");
+        }
+      }
+
+      async function toggleOutput() {
+        const enabled = document.getElementById("outputToggle").checked;
+        try {
+          await psu.setOutput(enabled);
+          psu.log(`✅ Output ${enabled ? "enabled" : "disabled"}`);
+        } catch (error) {
+          psu.log(`Error toggling output: ${error.message}`, "error");
+          // Revert checkbox state
+          document.getElementById("outputToggle").checked = !enabled;
+        }
+      }
+
+      async function refreshAll() {
+        try {
+          // Get current settings
+          const voltage = await psu.getVoltage();
+          const current = await psu.getCurrent();
+          const voltageLimit = await psu.getVoltageLimit();
+          const currentLimit = await psu.getCurrentLimit();
+
+          // Update input fields
+          document.getElementById("voltageSet").value = voltage.toFixed(3);
+          document.getElementById("currentSet").value = current.toFixed(3);
+          document.getElementById("voltageLimitSet").value =
+            voltageLimit.toFixed(3);
+          document.getElementById("currentLimitSet").value =
+            currentLimit.toFixed(3);
+
+          // Update measurements
+          await updateMeasurements();
+
+          psu.log("✅ All values updated");
+        } catch (error) {
+          psu.log(`Error updating values: ${error.message}`, "error");
+        }
+      }
+
+      async function emergencyStop() {
+        try {
+          await psu.setOutput(false);
+          document.getElementById("outputToggle").checked = false;
+          psu.log("🚨 EMERGENCY STOP - Output disabled!");
+        } catch (error) {
+          psu.log(`Error during emergency stop: ${error.message}`, "error");
+        }
+      }
+
+      // Event Listeners
+      document
+        .getElementById("connectBtn")
+        .addEventListener("click", async () => {
+          if (isConnected) {
+            await disconnectFromPSU();
+          } else {
+            await connectToPSU();
+          }
         });
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", () => {
+        // Check if Web Serial is supported
+        if (!("serial" in navigator)) {
+          document.getElementById("status").textContent =
+            "Web Serial API not supported!";
+          document.getElementById("status").className = "status disconnected";
+          document.getElementById("connectBtn").disabled = true;
+          psu.log(
+            "❌ Web Serial API is not supported by this browser!",
+            "error"
+          );
+          psu.log(
+            "💡 Please use Chrome, Edge or another Chromium-based browser.",
+            "error"
+          );
+        } else {
+          psu.log("✅ Web Serial API available");
+          psu.log("🔌 Ready to connect to OWON PSU");
+        }
+      });
     </script>
-</body>
+  </body>
 </html>
