@@ -2,6 +2,8 @@
 
 Ein modernes Webinterface zur Steuerung und Überwachung von OWON (und kompatiblen) Labornetzteilen über die Web Serial API (z.B. Chrome/Edge).
 
+Available for testing: https://reptil1990.github.io/OwonWebControll/
+
 ## Features
 - Verbindung zu OWON Netzteilen via Web Serial API (USB)
 - Live-Anzeige von Spannung und Strom
