@@ -505,7 +505,6 @@
           }
         }
 
-        // ...existing code...
         async sendSilentCommand(command) {
           if (!this.port || !this.writer) {
             throw new Error("Keine Verbindung zum Gerät!");
@@ -521,7 +520,6 @@
             throw error;
           }
         }
-        // ...existing code...
 
         async readWithTimeout(timeoutMs) {
           return new Promise(async (resolve, reject) => {
