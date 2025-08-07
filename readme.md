@@ -39,7 +39,11 @@ Available for testing: https://reptil1990.github.io/OwonWebControll/
 
 ## License
 
-MIT License
+MIT License with Non-Commercial Clause
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software to use, copy, modify, or distribute the Software for 
+**non-commercial purposes only**, subject to the following conditions:
 
 ---
 
