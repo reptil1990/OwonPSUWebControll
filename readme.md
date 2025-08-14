@@ -2,7 +2,7 @@
 
 A modern web interface for controlling and monitoring OWON (and compatible) laboratory power supplies via the Web Serial API (e.g. Chrome/Edge).
 
-Available for testing: https://reptil1990.github.io/OwonWebControll/
+Available for testing: [https://reptil1990.github.io/OwonWebControll/](https://reptil1990.github.io/OwonPSUWebControll/)
 
 ## Features
 
